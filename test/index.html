@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Mocha Tests</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://unpkg.com/mocha/mocha.css" />
+  </head>
+  <body>
+    <div id="mocha"></div>
+
+    <script src="https://unpkg.com/chai/chai.js"></script>
+    <script src="https://unpkg.com/mocha/mocha.js"></script>
+    <script src="https://unpkg.com/moment@2.24.0/moment.js"></script>
+    <script src="../dist/browser.js"></script>
+
+    <script class="mocha-init">
+      mocha.setup({
+        ui: 'bdd',
+        checkLeaks: true,
+        asyncOnly: true,
+        timeout: 30000
+      });
+
+      const expect = chai.expect;
+    </script>
+    <script src="/test/util.test.js"></script>
+    <script src="/test/db.test.js"></script>
+    <script src="/test/table.row.test.js"></script>
+    <script src="/test/table.column.test.js"></script>
+    <script class="mocha-exec">
+      function start() {
+        gapi.load('client:auth2', function () {
+          gapi.client.init({
+            clientId: '297241099307-hbrcj992ghbs29dgft9p9leqi7ma4ho1.apps.googleusercontent.com',
+            discoveryDocs: GoogleSheetsORM.DISCOVERY_DOCS,
+            scope: GoogleSheetsORM.SCOPES + " https://www.googleapis.com/auth/drive.file"
+          }).then(function () {
+            maybeStartMocha(gapi.auth2.getAuthInstance().isSignedIn.get());
+            gapi.auth2.getAuthInstance().isSignedIn.listen(maybeStartMocha);
+          });
+        });
+      }
+
+      var first = true;
+      function maybeStartMocha(isSignedIn) {
+        if (!isSignedIn) return gapi.auth2.getAuthInstance().signIn();
+        if (first) {
+          mocha.run();
+        }
+        first = false;
+      }
+    </script>
+    <script async defer src="https://apis.google.com/js/api.js"
+      onload="this.onload=function(){};start()"
+      onreadystatechange="if (this.readyState === 'complete') this.onload()">
+    </script>
+  </body>
+</html>
