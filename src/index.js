@@ -61,9 +61,8 @@ class DB {
              spreadsheetId: file.id
            }).then(processResponse).then(response => {
              console.log(`Database found: ${this.id}`);
+             this.sheets = keyBy(response.sheets, 'properties.title');
              return response;
-           }).then(({sheets}) => {
-             this.sheets = keyBy(sheets, 'properties.title');
            });
          }
 
@@ -87,7 +86,6 @@ class DB {
           return response.result;
         });
       }).then(({sheets}) => {
-        console.log(this.id);
         this.sheets = keyBy(sheets, 'properties.title');
       });
     }
@@ -117,7 +115,7 @@ class DB {
   table(name, fields, options = {}) {
     options.mode = options.mode || ORM.ROW;
     options.insertOrder = options.insertOrder || ORM.APPEND;
-    if (![ROW, COLUMN].includes(options.mode)) throw new Error('Table mode must be one of [ROW, GoogleSheetsORM.COLUMN]');
+    if (![ROW, COLUMN].includes(options.mode)) throw new Error('Table mode must be one of [GoogleSheetsORM.ROW, GoogleSheetsORM.COLUMN]');
     if (![PREPEND, APPEND].includes(options.insertOrder)) throw new Error('Table insert order must be one of [GoogleSheetsORM.PREPEND, GoogleSheetsORM.APPEND]');
 
     if (options.mode === ROW) return new RowTable(this, name, fields, options);

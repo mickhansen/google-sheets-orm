@@ -13,11 +13,11 @@ describe('table (column)', function () {
     this.orm = new GoogleSheetsORM(gapi.client);
     this.db = this.orm.db('google-sheets-orm-test-table-column');
 
-    //return this.db.destroy();
+    return this.db.destroy();
   });
 
   after(function () {
-    //return this.db.destroy();
+    return this.db.destroy();
   });
 
   describe('insert', function () {

@@ -12,7 +12,6 @@ export default class Table {
 
     this.orm = db.orm;
     this.mode = options.mode || ROW;
-    console.log(options);
     this.insertOrder = options.insertOrder || APPEND;
 
     if (this.mode === COLUMN && this.insertOrder === APPEND) throw new Error('APPEND is not supported for mode COLUMN currently');
