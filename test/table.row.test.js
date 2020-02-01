@@ -158,6 +158,45 @@ describe('table (row)', function () {
     });
   });
 
+  describe('upsert', function () {
+    it('creates row or finds/updated it', async function () {
+      this.timeout(30000);
+
+      const id = Math.random().toString();
+      const table = this.db.table('upsert', {
+        id: {
+          primaryKey: true
+        },
+        value: {
+          type: Number,
+          required: true
+        }
+      }, {
+        mode: GoogleSheetsORM.ROW
+      });
+
+      const a = await table.upsert({
+        id,
+        value: 1
+      });
+      expect(a.value).to.equal(1);
+      expect(await table.getRaw()).to.deep.equal([
+        ['id', 'value'],
+        [id, '1']
+      ]);
+
+      const b = await table.upsert({
+        id,
+        value: 2
+      });
+      expect(b.value).to.equal(2);
+      expect(await table.getRaw()).to.deep.equal([
+        ['id', 'value'],
+        [id, '2']
+      ]);
+    });
+  });
+
   describe('findByPk', function () {
     it('retrieves row', async function () {
       const table = this.db.table(makeid(10), {

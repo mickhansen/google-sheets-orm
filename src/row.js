@@ -20,9 +20,11 @@ export default class Row extends ValueSet {
       valueInputOption: 'RAW'
     }, {
       majorDimension: 'COLUMNS',
-      values: this.table._prepareColumnValues(this)
+      values: this.table._prepareValues(this)
     }).then(() => {
       console.log('Row updated');
+
+      return this;
     });
   }
 }

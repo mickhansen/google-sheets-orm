@@ -152,6 +152,16 @@ export default class Table {
     });
   }
 
+  upsert(values) {
+    const pk = values[this.pk];
+    if (!pk) throw new Error('upsert: pk must be in values');
+
+    return this.findByPk(pk).then((valueSet) => {
+      if (valueSet) return valueSet.update(values);
+      return this.insert(values);
+    });
+  }
+
   findByPk(search) {
     return this.findAll().then((valueSets) => {
       if (!valueSets.length) return null;
@@ -168,11 +178,12 @@ export default class Table {
         majorDimension: this.mode === ROW ? 'ROWS' : 'COLUMNS',
       }).then(processResponse).then(response => {
         if (!response.values) return [];
-        const responseValues = response.values.slice(this.skip + (this.mode === ROW ? 1 : 0), response.values.length);
+        const skip = this.skip + (this.mode === ROW ? 1 : 0);
+        const responseValues = response.values.slice(skip, response.values.length);
         if(!responseValues.length) return [];
 
         if (this.mode === ROW) {
-          return responseValues.map((row) => {
+          return responseValues.map((row, index) => {
             const values = row.reduce((memo, value, index) => {
               const column = numberToColumnLetter(index);
               const field = find(this.fields, search => search.column === column);
@@ -181,7 +192,9 @@ export default class Table {
               memo[field.header] = field.type ? field.type(value) : value;
               return memo;
             }, {});
-            return new this.valueSetClass(this, values, {});
+            return new this.valueSetClass(this, values, {
+              row: skip + index + 1
+            });
           });
         }
         if (this.mode === COLUMN) {
