@@ -33,7 +33,6 @@ export default class RowTable extends Table {
           const missing = Object.keys(this.fields).filter(search => !existing.includes(search));
           const start = numberToColumnLetter(existing.length) + '1';
           const end = numberToColumnLetter(existing.length + missing.length) + '1';
-          const headers = existing.concat(missing).filter(key => this.fields[key]);
 
           this._sheetHeaders = existing.concat(missing);
 
@@ -45,11 +44,12 @@ export default class RowTable extends Table {
             values: missing.map(value => [value]),
             majorDimension: "COLUMNS"
           }).then(() => {
-            headers.forEach((key, i) => {
-              this.fields[key].column = numberToColumnLetter(existing.length + i);
+            this._sheetHeaders.forEach((key, i) => {
+              if (!this.fields[key]) return;
+              this.fields[key].column = numberToColumnLetter(i);
               this.fields[key].location = this.fields[key].column + 1;
               this.fields[key].first = i === 0;
-              this.fields[key].last = i === (headers.length - 1);
+              this.fields[key].last = i === (this._sheetHeaders.length - 1);
 
               if (this.fields[key].first) {
                 this.firstField = key;

@@ -230,7 +230,7 @@ describe('table (row)', function () {
   });
 
   describe('findAll', function () {
-    it('retrieves all rows', async function () {
+    it('retrieves all rows for existing table', async function () {
       const table = this.db.table(makeid(10), {
         date: {
           primaryKey: true
@@ -255,6 +255,53 @@ describe('table (row)', function () {
         majorDimension: "COLUMNS"
       });
 
+
+      const values = [
+        {
+          date: moment().subtract(3, 'day').format('YYYY-MM-DD'),
+          calories: Math.ceil(Math.random() * 8000)
+        },
+        {
+          date: moment().subtract(2, 'day').format('YYYY-MM-DD'),
+          calories: Math.ceil(Math.random() * 8000)
+        },
+        {
+          date: moment().subtract(1, 'day').format('YYYY-MM-DD'),
+          calories: Math.ceil(Math.random() * 8000)
+        },
+        {
+          date: moment().format('YYYY-MM-DD'),
+          calories: Math.ceil(Math.random() * 8000)
+        }
+      ];
+
+      await table.insert(values[0]);
+      await table.insert(values[1]);
+      await table.insert(values[2]);
+      await table.insert(values[3]);
+
+      const rows = await table.findAll();
+      expect(rows).to.have.length(values.length);
+
+      expect(rows[0]).to.deep.equal(values[0]);
+      expect(rows[1]).to.deep.equal(values[1]);
+      expect(rows[2]).to.deep.equal(values[2]);
+      expect(rows[3]).to.deep.equal(values[3]);
+    });
+
+    it('retrieves all rows for created table', async function () {
+      const table = this.db.table(makeid(10), {
+        date: {
+          primaryKey: true
+        },
+        calories: {
+          type: Number
+        }
+      }, {
+        mode: GoogleSheetsORM.ROW
+      });
+
+      await table.ddl();
 
       const values = [
         {

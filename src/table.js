@@ -189,9 +189,10 @@ export default class Table {
               const field = find(this.fields, search => search.column === column);
               if (!field) return memo;
 
-              memo[field.header] = field.type ? field.type(value) : value;
+              memo[field.header] = value === null ? null : field.type ? field.type(value) : value;
               return memo;
             }, {});
+
             return new this.valueSetClass(this, values, {
               row: skip + index + 1
             });
