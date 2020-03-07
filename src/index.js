@@ -37,7 +37,7 @@ class ORM {
 
   search(query) {
     return this.drive.files.list({
-      q: `owner = 'me' and mimeType='application/vnd.google-apps.spreadsheet' and name contains '${query}' and trashed = false`,
+      q: `'me' in owners and mimeType='application/vnd.google-apps.spreadsheet' and name contains '${query}' and trashed = false`,
       'fields': "files(id,name)"
     }).then(processResponse).then((response) => {
       return response.files.map(file => {
