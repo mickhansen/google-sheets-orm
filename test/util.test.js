@@ -5,14 +5,17 @@ describe('util', function () {
       2: 'C',
       18: 'S',
       25: 'Z',
-      26: 'BA',
-      44: 'BS',
-      51: 'BZ',
-      52: 'CA',
-      77: 'CZ',
-      78: 'DA',
-      80: 'DC',
-      104: 'EA'
+      26: 'AA',
+      44: 'AS',
+      51: 'AZ',
+      52: 'BA',
+      77: 'BZ',
+      78: 'CA',
+      80: 'CC',
+      104: 'DA',
+      130: 'EA',
+      140: 'EK',
+      147: 'ER'
     };
 
     Object.keys(check).forEach(number => {

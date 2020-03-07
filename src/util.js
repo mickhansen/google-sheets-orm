@@ -1,6 +1,6 @@
 export function numberToColumnLetter(number) { // 0 based
   if (number >= 26) {
-    return numberToColumnLetter(Math.floor(number / 26)) + numberToColumnLetter(number % 26);
+    return numberToColumnLetter(Math.floor((number - 26) / 26)) + numberToColumnLetter(number % 26);
   }
   return String.fromCharCode(65 + number);
 }
