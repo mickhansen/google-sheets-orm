@@ -66,12 +66,12 @@ export default class Table {
     return this._create;
   }
 
-  getRaw() {
+  getRaw(majorDimension = 'ROWS') {
     return this.orm.sheets.spreadsheets.values.get({
       spreadsheetId: this.db.id,
       range: `${this.name}!A:XXX`
     }, {
-      majorDimension: 'ROWS'
+      majorDimension
     }).then(processResponse).then(response => {
       return response.values;
     });
