@@ -34,6 +34,20 @@ class ORM {
   db(name) {
     return new DB(this, name);
   }
+
+  search(query) {
+    return this.drive.files.list({
+      q: `mimeType='application/vnd.google-apps.spreadsheet' and name contains '${query}' and trashed = false`,
+      'fields': "files(id,name)"
+    }).then(processResponse).then((response) => {
+      return response.files.map(file => {
+        const db = this.db(file.name);
+        db.id = file.id;
+
+        return db;
+      });
+    });
+  }
 }
 
 class DB {
@@ -48,26 +62,27 @@ class DB {
 
   find() {
     if (!this.found) {
-      this.found = this.orm.drive.files.list({
-        q: `name = '${this.name}' and trashed = false`,
-        'pageSize': 1,
-        'fields': "files(id)"
-      }).then(processResponse).then((response) => {
-         const file = response.files[0];
+      this.found = Promise.resolve().then(() => {
+        if (this.id) return;
+        return this.orm.drive.files.list({
+          q: `mimeType='application/vnd.google-apps.spreadsheet' and name = '${this.name}' and trashed = false`,
+          'pageSize': 1,
+          'fields': "files(id)"
+        }).then(processResponse).then((response) => {
+           const file = response.files[0];
+           if (file) this.id = file.id;
+        });
+      }).then(() => {
+        if (!this.id) return null;
 
-         if (file) {
-           this.id = file.id;
-           return this.orm.sheets.spreadsheets.get({
-             spreadsheetId: file.id
-           }).then(processResponse).then(response => {
-             console.log(`Database found: ${this.id}`);
-             this.sheets = keyBy(response.sheets, 'properties.title');
-             return response;
-           });
-         }
-
-         return null;
-       });
+        return this.orm.sheets.spreadsheets.get({
+          spreadsheetId: this.id
+        }).then(processResponse).then(response => {
+          console.log(`Database found: ${this.id}`);
+          this.sheets = keyBy(response.sheets, 'properties.title');
+          return this;
+        });
+      });
     }
     return this.found;
   }
@@ -87,6 +102,7 @@ class DB {
         });
       }).then(({sheets}) => {
         this.sheets = keyBy(sheets, 'properties.title');
+        return this;
       });
     }
     return this.created;
