@@ -6,7 +6,7 @@ export default class Cell {
     Object.defineProperty(this, 'db', { value: sheet.db, enumerable: false });
     Object.defineProperty(this, 'orm', { value: sheet.orm, enumerable: false });
 
-    this.value = options.value;
+    this.value = value;
     if (options.id) this.id = options.id;
     if (options.row && options.column) this.id = numberToColumnLetter(options.column) + (options.row + 1);
     if (!this.id) throw new Error('Cell id must be supplied');
