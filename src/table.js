@@ -4,10 +4,12 @@ import mapValues from 'lodash/mapValues';
 import last from 'lodash/last';
 import isPlainObject from 'lodash/isPlainObject';
 
+import Sheet from './sheet';
 import {processResponse, numberToColumnLetter, RowExistsError, ColumnExistsError, ROW, COLUMN, APPEND, PREPEND} from './util';
 
-export default class Table {
+export default class Table extends Sheet {
   constructor(db, name, fields, options = {}) {
+    super(db, name, options);
     if (!db || !name || !fields) throw new Error('new Table(db, name, fields) is required');
 
     this.orm = db.orm;
@@ -32,49 +34,6 @@ export default class Table {
     if (!this.pk) throw new Error('Table must have primaryKey defined');
 
     this.ddlSynced = null;
-    this._create = null;
-  }
-
-  id() {
-    return this.db.sheets[this.name] ? this.db.sheets[this.name].properties.sheetId : null;
-  }
-
-  create() {
-    if (!this._create) {
-      this._create = this.db.create().then(() => {
-        if (!this.db.sheets[this.name]) {
-          return this.orm.sheets.spreadsheets.batchUpdate({
-            spreadsheetId: this.db.id
-          }, {
-            requests: [
-              {
-                addSheet: {
-                  properties: {
-                    title: this.name
-                  }
-                }
-              }
-            ]
-          }).then(processResponse).then(response => {
-            this.db.sheets[this.name] = response.replies[0].addSheet;
-          });
-        } else {
-          return Promise.resolve();
-        }
-      });
-    }
-    return this._create;
-  }
-
-  getRaw(majorDimension = 'ROWS') {
-    return this.orm.sheets.spreadsheets.values.get({
-      spreadsheetId: this.db.id,
-      range: `${this.name}!A:XXX`
-    }, {
-      majorDimension
-    }).then(processResponse).then(response => {
-      return response.values;
-    });
   }
 
   insert(values) {

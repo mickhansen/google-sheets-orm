@@ -14,6 +14,7 @@ import {processResponse, RowExistsError, ColumnExistsError, ROW, COLUMN, PREPEND
 import Row from './row';
 import Column from './column';
 
+import Sheet from './sheet';
 import RowTable from './table-row';
 import ColumnTable from './table-column';
 
@@ -126,6 +127,10 @@ class DB {
       this.found = null;
       this.created = null;
     });
+  }
+
+  sheet(name, options) {
+    return new Sheet(this, name, options);
   }
 
   table(name, fields, options = {}) {
