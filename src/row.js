@@ -11,7 +11,7 @@ export default class Row extends ValueSet {
   }
 
   update(values) {
-    assign(this, values);
+    this.set(values);
     this.validate();
 
     return this.orm.sheets.spreadsheets.values.update({

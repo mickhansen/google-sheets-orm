@@ -11,6 +11,11 @@ export default class ValueSet {
     Object.defineProperty(this, 'orm', { value: table.orm, enumerable: false });
   }
 
+  set(values) {
+    assign(this, values);
+    return this;
+  }
+
   defaults() {
     each(this.table.fields, (field) => {
       if (field.defaultValue !== undefined && this[field.header || field.key] === undefined) {
