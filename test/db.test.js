@@ -10,7 +10,7 @@ describe('db', function () {
     });
   });
 
-  it('finds existing database', function () {
+  it('finds existing database via name or id', function () {
     this.timeout(30000);
 
     const orm = new GoogleSheetsORM(gapi.client);
@@ -26,6 +26,17 @@ describe('db', function () {
     }).then(function () {
       return dbB.create().then(function () {
         expect(dbA.id).to.equal(dbB.id);
+      });
+    }).then(() => {
+      const dbC = orm.db({
+        id: dbA.id
+      });
+
+      return dbC.find().then(function () {
+        expect(dbC.name).to.equal(dbA.name);
+        expect(dbC.id).to.equal(dbA.id);
+        expect(dbC.found).to.be.ok;
+        expect(dbC.sheets).to.be.ok;
       });
     });
   });

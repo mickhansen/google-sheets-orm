@@ -42,8 +42,7 @@ class ORM {
       'fields': "files(id,name)"
     }).then(processResponse).then((response) => {
       return response.files.map(file => {
-        const db = this.db(file.name);
-        db.id = file.id;
+        const db = this.db(file);
 
         return db;
       });
@@ -52,12 +51,20 @@ class ORM {
 }
 
 class DB {
-  constructor(orm, name) {
+  constructor(orm, value) {
+    let name, id;
+    if (typeof value === 'string') {
+      name = value;
+    } else {
+      name = value.name;
+      id = value.id;
+    }
+
     this.orm = orm;
-    this.name = name;
+    this.name = name || null;
     this.created = null;
     this.found = null;
-    this.id = null;
+    this.id = id || null;
     this.sheets = {};
   }
 
@@ -79,7 +86,7 @@ class DB {
         return this.orm.sheets.spreadsheets.get({
           spreadsheetId: this.id
         }).then(processResponse).then(response => {
-          console.log(`Database found: ${this.id}`);
+          this.name = response.properties.title;
           this.sheets = keyBy(response.sheets, 'properties.title');
           return this;
         });
