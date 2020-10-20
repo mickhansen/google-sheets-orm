@@ -2,14 +2,14 @@
   "name": "google-sheets-orm",
   "version": "1.5.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "dist/node.js",
   "browser": "dist/browser.js",
   "directories": {
     "example": "example"
   },
   "scripts": {
     "prepublish": "npm run build",
-    "build": "webpack --config webpack.config.js",
+    "build": "webpack --config webpack.config.js && webpack --config webpack.config.node.js",
     "watch": "webpack --watch --config webpack.config.js",
     "test": "python -m SimpleHTTPServer"
   },
@@ -24,7 +24,8 @@
     "googleapis": "^46.0.0",
     "mocha": "^6.2.2",
     "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.9"
+    "webpack-cli": "^3.3.9",
+    "webpack-node-externals": "^2.5.2"
   },
   "dependencies": {
     "lodash": "^4.17.15"
