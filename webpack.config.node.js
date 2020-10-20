@@ -8,7 +8,9 @@ module.exports = {
   externals: [nodeExternals()],
   output: {
     filename: 'node.js',
-    path: path.resolve(__dirname, 'dist')
+    path: path.resolve(__dirname, 'dist'),
+    library: 'google-sheets-orm',
+    libraryTarget: 'commonjs2'
   },
   mode: 'development',
   module: {
