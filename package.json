@@ -4,6 +4,7 @@
   "description": "",
   "main": "dist/node.js",
   "browser": "dist/browser.js",
+  "types": "index.d.ts",
   "directories": {
     "example": "example"
   },
