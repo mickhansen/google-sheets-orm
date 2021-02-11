@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable max-classes-per-file */
 declare module "google-sheets-orm" {
     import { sheets_v4 } from "googleapis"
 
@@ -49,9 +52,9 @@ declare module "google-sheets-orm" {
     }
 
     function numberToColumnLetter(number: number): string;
-    function processResponse<T>(response: {data: T}): T;
-    function processResponse<T>(response: {result: T}): T;
-    function processResponse<T>(response: T): T;
+    // function processResponse<T>(response: { data: T }): T;
+    // function processResponse<T>(response: { result: T }): T;
+    // function processResponse<T>(response: T): T;
     class ValueSetExistsError extends Error {
         constructor(message?: string | undefined);
     }
@@ -82,17 +85,21 @@ declare module "google-sheets-orm" {
         update(value: string): this;
     }
     class ValueSet<K> {
-        constructor(table: Table, values: Record<K, string>, options = {});
+        constructor(table: Table, values: Record<K, string>, options?: {});
         set(values: Record<K, string>): this;
         defaults(): void;
         validate(): void;
-        [key in K]: string
+        [s: string]: any;
     }
     class Column<K> extends ValueSet<K> {
-        constructor(table: ColumnTable, values: Record<K, string>, options = {});
+        constructor(
+            table: ColumnTable,
+            values: Record<K, string>,
+            options?: {}
+        );
     }
     class Row<K> extends ValueSet<K> {
-        constructor(table: RowTable, values: Record<K, string>, options = {});
+        constructor(table: RowTable, values: Record<K, string>, options?: {});
         update(values: Record<K, string>): Promise<this>;
     }
     class Sheet {
@@ -102,7 +109,9 @@ declare module "google-sheets-orm" {
         db: DB;
         id(): number | null;
         create(): Promise<sheets_v4.Schema$BatchUpdateSpreadsheetResponse>;
-        getRaw(majorDimension: TableMode = "ROW"): sheets_v4.Schema$ValueRange["values"];
+        getRaw(
+            majorDimension: TableMode = "ROW"
+        ): sheets_v4.Schema$ValueRange["values"];
         cell(value: string, options?: CellOptions): Cell;
     }
     type TableOptions = {
@@ -119,15 +128,10 @@ declare module "google-sheets-orm" {
         defaultValue?: string | (() => string);
     };
     type TableFields = Record<string, TableField>;
-    type QueryValue<T> = Record<keyof T, string>
-    type QueryResponce<T> = ValueSet<keyof T>
+    type QueryValue<T> = Record<keyof T, string>;
+    type QueryResponce<T> = ValueSet<keyof T>;
     class Table<T = TableFields> extends Sheet {
-        constructor(
-            db: DB,
-            name: string,
-            fields: T,
-            options?: TableOptions
-        );
+        constructor(db: DB, name: string, fields: T, options?: TableOptions);
         mode: TableMode;
         insertOrder: InsertOrder;
         fields: T;
@@ -167,4 +171,25 @@ declare module "google-sheets-orm" {
         firstField?: string;
         lastField?: string;
     }
-};
+    export type {
+        Cell,
+        CellOptions,
+        Column,
+        ColumnTable,
+        DB,
+        DBOptions,
+        InsertOrder,
+        QueryResponce,
+        QueryValue,
+        Row,
+        RowTable,
+        RowTableOptions,
+        Sheet,
+        Table,
+        TableField,
+        TableFields,
+        TableMode,
+        TableOptions,
+        ValueSet,
+    };
+}
