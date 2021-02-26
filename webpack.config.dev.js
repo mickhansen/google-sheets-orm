@@ -2,14 +2,15 @@ const path = require('path');
 
 module.exports = {
   entry: './src/index.js',
+  devtool: 'inline-source-map',
   output: {
-    filename: 'browser.js',
+    filename: 'browser.dev.js',
     path: path.resolve(__dirname, 'dist'),
     libraryTarget: 'umd',
     library: 'GoogleSheetsORM',
     libraryExport: 'default',
   },
-  mode: 'production',
+  mode: 'development',
   module: {
     rules: [
       {
