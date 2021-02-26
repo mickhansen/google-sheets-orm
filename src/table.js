@@ -158,15 +158,7 @@ export default class Table extends Sheet {
           });
         }
         if (this.mode === COLUMN) {
-          return responseValues.map((column) => {
-            const values = column.reduce((memo, value, index) => {
-              const field = find(this.fields, search => search.row === index);
-              if (!field) return memo;
-              memo[field.key] = field.type ? field.type(value) : value;
-              return memo;
-            }, {});
-            return new this.valueSetClass(this, values, {});
-          });
+          return this.parseResponse(responseValues);
         }
       });
     });
@@ -186,7 +178,14 @@ export default class Table extends Sheet {
   _prepareColumnValues(values, fields) {
     return Object.keys(fields).reduce((memo, key) => {
       if (isPlainObject(fields[key].type)) return memo.concat(this._prepareColumnValues(values[key], fields[key].type));
-      if (Array.isArray(fields[key].type)) return memo.concat([values[key].join(',')]);
+      if (Array.isArray(fields[key].type)) {
+        if (fields[key].repeating) {
+          return values[key].reduce((memo, value) => {
+            return memo.concat(this._prepareColumnValues(value, fields[key].type[0]));
+          }, memo)
+        }
+        return memo.concat([values[key].join(',')]);
+      }
       return memo.concat([values[key]]);
     }, []);
   }

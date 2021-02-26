@@ -242,6 +242,9 @@ describe('table (column)', function () {
         },
         t1: {
           type: {
+            exercise: {
+              type: String
+            },
             weight: {
               type: Number
             },
@@ -252,6 +255,9 @@ describe('table (column)', function () {
         },
         t2: {
           type: {
+            exercise: {
+              type: String
+            },
             weight: {
               type: Number
             },
@@ -267,18 +273,103 @@ describe('table (column)', function () {
 
       const column = await table.insert({
         t1: {
+          exercise: "Bench Press",
           weight: 120,
           reps: [5, 1, 1, 1, 1, 1]
         },
         t2: {
+          exercise: "Overhead Press",
           weight: 60,
           reps: [8, 4, 4, 4, 4]
         }
       });
 
-      console.log(column);
+      expect(await table.getRaw()).to.deep.equal([
+        [column.id],
+        ["Bench Press"],
+        ["120"],
+        ["5,1,1,1,1,1"],
+        ["Overhead Press"],
+        ["60"],
+        ["8,4,4,4,4"]
+      ]);
 
-      console.log(await table.findByPk(column.id));
+      const found = await table.findByPk(column.id);
+
+      expect(found.t1).to.deep.equal({
+        exercise: "Bench Press",
+        weight: 120,
+        reps: [5, 1, 1, 1, 1, 1]
+      })
+      expect(found.t2).to.deep.equal({
+        exercise: "Overhead Press",
+        weight: 60,
+        reps: [8, 4, 4, 4, 4]
+      })
+    });
+
+    it('supporst repeating nested values', async function () {
+      const table = this.db.table('advanced-ddl-nested-repeating-values', {
+        id: {
+          primaryKey: true,
+          defaultValue: () => Math.random().toString()
+        },
+        exercises: {
+          type: Array({
+            exercise: {
+              type: String
+            },
+            weight: {
+              type: Number
+            },
+            reps: {
+              type: Array(Number)
+            }
+          })
+        }
+      }, {
+        mode: GoogleSheetsORM.COLUMN,
+        insertOrder: GoogleSheetsORM.PREPEND
+      });
+
+      const exercises = [
+        {
+          exercise: "Bench Press",
+          weight: 120,
+          reps: [5, 1, 1, 1, 1, 1]
+        },
+        {
+          exercise: "Overhead Press",
+          weight: 60,
+          reps: [8, 4, 4, 4, 4]
+        },
+        {
+          exercise: "Squat",
+          weight: 180,
+          reps: [3, 3, 3, 3]
+        }
+      ];
+
+      const column = await table.insert({
+        exercises
+      });
+
+      expect(await table.getRaw()).to.deep.equal([
+        [column.id],
+        ["Bench Press"],
+        ["120"],
+        ["5,1,1,1,1,1"],
+        ["Overhead Press"],
+        ["60"],
+        ["8,4,4,4,4"],
+        ["Squat"],
+        ["180"],
+        ["3,3,3,3"]
+      ]);
+
+      const found = await table.findByPk(column.id);
+
+      expect(found.exercises).to.deep.equal(exercises);
     });
   });
 });

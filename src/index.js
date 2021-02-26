@@ -1,28 +1,19 @@
-import findKey from 'lodash/findKey';
 import keyBy from 'lodash/keyBy';
-import map from 'lodash/map';
-import mapValues from 'lodash/mapValues';
-import assign from 'lodash/assign';
-import each from 'lodash/each';
-import isFunction from 'lodash/isFunction';
-import find from 'lodash/find';
-import last from 'lodash/last';
 import noop from 'lodash/noop';
 
-import {processResponse, RowExistsError, ColumnExistsError, ROW, COLUMN, PREPEND, APPEND, numberToColumnLetter} from './util';
-
-import Row from './row';
-import Column from './column';
+import {processResponse, RowExistsError, ColumnExistsError, ROW, COLUMN, DOCUMENT, PREPEND, APPEND, numberToColumnLetter} from './util';
 
 import Sheet from './sheet';
 import RowTable from './table-row';
 import ColumnTable from './table-column';
+import DocumentTable from './table-document';
 
 class ORM {
   static DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4", "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
   static SCOPES = "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.metadata.readonly";
   static ROW = ROW;
   static COLUMN = COLUMN;
+  static DOCUMENT = DOCUMENT;
   static PREPEND = PREPEND;
   static APPEND = APPEND;
 
@@ -82,7 +73,7 @@ class DB {
         });
       }).then(() => {
         if (!this.id) return null;
-
+        console.log(this.id);
         return this.orm.sheets.spreadsheets.get({
           spreadsheetId: this.id
         }).then(processResponse).then(response => {
@@ -143,11 +134,12 @@ class DB {
   table(name, fields, options = {}) {
     options.mode = options.mode || ORM.ROW;
     options.insertOrder = options.insertOrder || ORM.APPEND;
-    if (![ROW, COLUMN].includes(options.mode)) throw new Error('Table mode must be one of [GoogleSheetsORM.ROW, GoogleSheetsORM.COLUMN]');
+    if (![ROW, COLUMN, DOCUMENT].includes(options.mode)) throw new Error('Table mode must be one of [GoogleSheetsORM.ROW, GoogleSheetsORM.COLUMN, GoogleSheetsORM.DOCUMENT]');
     if (![PREPEND, APPEND].includes(options.insertOrder)) throw new Error('Table insert order must be one of [GoogleSheetsORM.PREPEND, GoogleSheetsORM.APPEND]');
 
     if (options.mode === ROW) return new RowTable(this, name, fields, options);
     if (options.mode === COLUMN) return new ColumnTable(this, name, fields, options);
+    if (options.mode === DOCUMENT) return new DocumentTable(this, name, fields, options);
   }
 }
 

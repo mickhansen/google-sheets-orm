@@ -30,7 +30,16 @@ export class ColumnExistsError extends ValueSetExistsError {
   }
 }
 
+export class DocumentExistsError extends ValueSetExistsError {
+  constructor(message) {
+    super(message);
+    this.name = "DocumentExistsError";
+  }
+}
+
 export const ROW = 'ROW';
 export const COLUMN = 'COLUMN';
+export const DOCUMENT = 'DOCUMENT';
 export const PREPEND = 'PREPEND';
 export const APPEND = 'APPEND';
+export const NESTED = 'NESTED';

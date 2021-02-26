@@ -9,4 +9,5 @@
 ## Column mode
 
 - Does not support existing spreadsheets (unless they conform to the exact format)
-- Supports one set of repeating fields
+- Supports nested types
+- Supports one set of repeating fields (must be last field defined)
