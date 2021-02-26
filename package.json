@@ -1,6 +1,6 @@
 {
   "name": "google-sheets-orm",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "",
   "main": "dist/node.js",
   "browser": "dist/browser.js",
