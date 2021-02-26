@@ -6,10 +6,6 @@ export default class Document extends ValueSet {
     super(type.table, values, options);
     this.type = type.name; 
   }
-
-  validate() {
-    
-  }
 }
 
 export class DocumentValue {

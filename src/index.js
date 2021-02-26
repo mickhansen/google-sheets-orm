@@ -73,13 +73,23 @@ class DB {
         });
       }).then(() => {
         if (!this.id) return null;
-        console.log(this.id);
         return this.orm.sheets.spreadsheets.get({
           spreadsheetId: this.id
         }).then(processResponse).then(response => {
           this.name = response.properties.title;
           this.sheets = keyBy(response.sheets, 'properties.title');
           return this;
+        }).catch(result => {
+          result = processResponse(result);
+
+          if (result.error) {
+            if (result.error.code === 404) {
+              this.id = null;
+              return null;
+            }
+            throw result.error;
+          }
+          throw result;
         });
       });
     }

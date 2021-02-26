@@ -371,5 +371,86 @@ describe('table (column)', function () {
 
       expect(found.exercises).to.deep.equal(exercises);
     });
+
+    it('supports updating nested values', async function () {
+      const table = this.db.table('advanced-ddl-nested-repeating-values-update', {
+        id: {
+          primaryKey: true,
+          defaultValue: () => Math.random().toString()
+        },
+        exercises: {
+          type: Array({
+            exercise: {
+              type: String
+            },
+            weight: {
+              type: Number
+            },
+            reps: {
+              type: Array(Number)
+            }
+          })
+        }
+      }, {
+        mode: GoogleSheetsORM.COLUMN,
+        insertOrder: GoogleSheetsORM.PREPEND
+      });
+
+      const column = await table.insert({
+        exercises: [{
+          exercise: "Overhead Press",
+          weight: 60,
+          reps: [8, 4, 4, 4, 4]
+        },
+        {
+          exercise: "Squat",
+          weight: 180,
+          reps: [3, 3, 3, 3]
+        }]
+      });
+
+      const other = await table.insert({
+        exercises: [{
+          exercise: "Overhead Press",
+          weight: 85,
+          reps: [1, 1, 1, 1, 1]
+        }]
+      });
+
+      expect(await table.getRaw()).to.deep.equal([
+        [other.id, column.id],
+        ["Overhead Press", "Overhead Press"],
+        ["85", "60"],
+        ["1,1,1,1,1", "8,4,4,4,4"],
+        ["", "Squat"],
+        ["", "180"],
+        ["", "3,3,3,3"]
+      ]);
+
+      await column.update({
+        exercises: [
+          {
+            exercise: "Squat",
+            weight: 180,
+            reps: [3, 3, 3, 3]
+          }
+        ]
+      });
+
+      expect(column.exercises).to.deep.equal([
+        {
+          exercise: "Squat",
+          weight: 180,
+          reps: [3, 3, 3, 3]
+        }
+      ]);
+
+      expect(await table.getRaw()).to.deep.equal([
+        [other.id, column.id],
+        ["Overhead Press", "Squat"],
+        ["85", "180"],
+        ["1,1,1,1,1", "3,3,3,3"]
+      ]);
+    });
   });
 });

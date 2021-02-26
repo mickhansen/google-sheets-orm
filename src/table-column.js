@@ -38,6 +38,7 @@ export default class ColumnTable extends Table {
           }
 
           if (Array.isArray(type) && isPlainObject(type[0])) {
+            this.repeatingField = fields[key];
             fields[key].repeating = true;
             fields[key].typeCount = Object.keys(type[0]).length;
 

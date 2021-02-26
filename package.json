@@ -10,7 +10,7 @@
   "scripts": {
     "prepublish": "npm run build",
     "build": "webpack --config webpack.config.dev.js && webpack --config webpack.config.js && webpack --config webpack.config.node.js",
-    "watch": "webpack --watch --config webpack.config.js",
+    "watch": "webpack --watch --config webpack.config.dev.js",
     "test": "python -m SimpleHTTPServer"
   },
   "author": "",
